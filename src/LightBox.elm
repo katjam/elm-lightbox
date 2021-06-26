@@ -3,6 +3,7 @@ module LightBox exposing (..)
 import Array
 import Browser
 import Html exposing (..)
+import Html.Attributes exposing (..)
 
 
 
@@ -23,15 +24,30 @@ main =
 
 
 type alias Model =
-    { images : Array.Array String
+    { images : List String
+    , selectedImageSrc : String
     }
 
 
 init : Array.Array String -> ( Model, Cmd Msg )
 init images =
-    ( { images = images }
+    let
+        srcList =
+            Array.toList images
+    in
+    ( { images = srcList, selectedImageSrc = initialSelectedImage srcList }
     , Cmd.none
     )
+
+
+thumbSrcToFull : String -> String
+thumbSrcToFull url =
+    String.replace "-150x150" "" url
+
+
+initialSelectedImage : List String -> String
+initialSelectedImage images =
+    Maybe.withDefault "" (List.head images)
 
 
 
@@ -66,4 +82,11 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div [] (List.map (\src -> text src) (Array.toList model.images))
+    div []
+        [ div [] [ img [ src (thumbSrcToFull model.selectedImageSrc) ] [] ]
+        , div []
+            (List.map
+                (\source -> img [ src source ] [])
+                model.images
+            )
+        ]
