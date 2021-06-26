@@ -2706,7 +2706,7 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 	return {
 		o: func(record.o),
 		L: record.L,
-		H: record.H
+		I: record.I
 	}
 });
 
@@ -2978,7 +2978,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.L;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.H) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.I) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -5169,8 +5169,8 @@ var $author$project$LightBox$init = function (images) {
 	var srcList = $elm$core$Array$toList(images);
 	return _Utils_Tuple2(
 		{
-			E: srcList,
-			I: $author$project$LightBox$initialSelectedImage(srcList)
+			F: srcList,
+			E: $author$project$LightBox$initialSelectedImage(srcList)
 		},
 		$elm$core$Platform$Cmd$none);
 };
@@ -5182,10 +5182,33 @@ var $author$project$LightBox$subscriptions = function (model) {
 };
 var $author$project$LightBox$update = F2(
 	function (msg, model) {
-		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+		var src = msg;
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{E: src}),
+			$elm$core$Platform$Cmd$none);
 	});
+var $author$project$LightBox$SelectedImage = $elm$core$Basics$identity;
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5226,7 +5249,7 @@ var $author$project$LightBox$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$src(
-								$author$project$LightBox$thumbSrcToFull(model.I))
+								$author$project$LightBox$thumbSrcToFull(model.E))
 							]),
 						_List_Nil)
 					])),
@@ -5240,11 +5263,12 @@ var $author$project$LightBox$view = function (model) {
 							$elm$html$Html$img,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$src(source)
+									$elm$html$Html$Attributes$src(source),
+									$elm$html$Html$Events$onClick(source)
 								]),
 							_List_Nil);
 					},
-					model.E))
+					model.F))
 			]));
 };
 var $author$project$LightBox$main = $elm$browser$Browser$element(

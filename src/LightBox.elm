@@ -3,7 +3,8 @@ module LightBox exposing (..)
 import Array
 import Browser
 import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html.Attributes exposing (src)
+import Html.Events exposing (onClick)
 
 
 
@@ -55,14 +56,14 @@ initialSelectedImage images =
 
 
 type Msg
-    = None
+    = SelectedImage String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        None ->
-            ( model
+        SelectedImage src ->
+            ( { model | selectedImageSrc = src }
             , Cmd.none
             )
 
@@ -86,7 +87,7 @@ view model =
         [ div [] [ img [ src (thumbSrcToFull model.selectedImageSrc) ] [] ]
         , div []
             (List.map
-                (\source -> img [ src source ] [])
+                (\source -> img [ src source, onClick (SelectedImage source) ] [])
                 model.images
             )
         ]
