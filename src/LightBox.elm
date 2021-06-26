@@ -2,9 +2,9 @@ module LightBox exposing (..)
 
 import Array
 import Browser
-import Html exposing (..)
-import Html.Attributes exposing (src)
-import Html.Events exposing (onClick)
+import Element exposing (..)
+import Element.Events exposing (onClick)
+import Html exposing (Html)
 
 
 
@@ -83,11 +83,29 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div [] [ img [ src (thumbSrcToFull model.selectedImageSrc) ] [] ]
-        , div []
-            (List.map
-                (\source -> img [ src source, onClick (SelectedImage source) ] [])
-                model.images
-            )
-        ]
+    layout [] <|
+        column []
+            [ row []
+                [ image
+                    [ width fill
+                    , height fill
+                    ]
+                    { src = thumbSrcToFull model.selectedImageSrc
+                    , description = ""
+                    }
+                ]
+            , wrappedRow []
+                (List.map
+                    (\source ->
+                        image
+                            [ width fill
+                            , height fill
+                            , onClick (SelectedImage source)
+                            ]
+                            { src = source
+                            , description = ""
+                            }
+                    )
+                    model.images
+                )
+            ]
