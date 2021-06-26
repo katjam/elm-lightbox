@@ -84,7 +84,7 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     layout [] <|
-        column []
+        column [ paddingXY 50 0 ]
             [ row []
                 [ image
                     [ width fill
@@ -94,7 +94,7 @@ view model =
                     , description = ""
                     }
                 ]
-            , wrappedRow []
+            , wrappedRow [ paddingXY 0 15, spacing 15 ]
                 (List.map
                     (\source ->
                         image
