@@ -77,6 +77,7 @@ update msg model =
                     getPreviousSrc model
             in
             ( { model | selectedImageSrc = previousImgSource }, Cmd.none )
+
         PressedNext ->
             let
                 nextImgSource =
@@ -86,12 +87,12 @@ update msg model =
 
 
 
-
 -- HELPERS
 
-getImageWithNeighbours : (String -> Bool) -> List String -> (Maybe String, Maybe String, Maybe String)
+
+getImageWithNeighbours : (String -> Bool) -> List String -> ( Maybe String, Maybe String, Maybe String )
 getImageWithNeighbours pred imageList =
-        case imageList of
+    case imageList of
         prevSrc :: currentSrc :: nextSrc :: rest ->
             if pred currentSrc then
                 ( Just prevSrc, Just currentSrc, Just nextSrc )
@@ -122,29 +123,40 @@ getImageWithNeighbours pred imageList =
         [] ->
             ( Nothing, Nothing, Nothing )
 
+
 getPreviousSrc : Model -> String
 getPreviousSrc model =
     let
-        imageWithNeighbours = getImageWithNeighbours (\src -> src == model.selectedImageSrc) model.imageList
-        (prevImageSrc, _, _) = imageWithNeighbours
+        imageWithNeighbours =
+            getImageWithNeighbours (\src -> src == model.selectedImageSrc) model.imageList
+
+        ( prevImageSrc, _, _ ) =
+            imageWithNeighbours
     in
-        case prevImageSrc of
-            Just src ->
-                src
-            Nothing ->
-                model.selectedImageSrc
+    case prevImageSrc of
+        Just src ->
+            src
+
+        Nothing ->
+            model.selectedImageSrc
+
 
 getNextSrc : Model -> String
 getNextSrc model =
     let
-        imageWithNeighbours = getImageWithNeighbours (\src -> src == model.selectedImageSrc) model.imageList
-        (_, _, nextImageSrc) = imageWithNeighbours
+        imageWithNeighbours =
+            getImageWithNeighbours (\src -> src == model.selectedImageSrc) model.imageList
+
+        ( _, _, nextImageSrc ) =
+            imageWithNeighbours
     in
-        case nextImageSrc of
-            Just src ->
-                src
-            Nothing ->
-                model.selectedImageSrc
+    case nextImageSrc of
+        Just src ->
+            src
+
+        Nothing ->
+            model.selectedImageSrc
+
 
 
 -- SUBSCRIPTIONS
@@ -177,7 +189,7 @@ view model =
                     { src = thumbSrcToFull model.selectedImageSrc
                     , description = ""
                     }
-                ,button []
+                , button []
                     { onPress = Just PressedNext
                     , label = text "next"
                     }
