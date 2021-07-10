@@ -3,10 +3,14 @@ module LightBox exposing (..)
 import Array
 import Browser
 import Element exposing (..)
+import Element.Background as Background
 import Element.Border exposing (rounded)
 import Element.Events exposing (onClick)
 import Element.Input exposing (button)
 import Html exposing (Html)
+import Svg exposing (..)
+import Svg.Attributes exposing (..)
+import Svg.Events exposing (onMouseOut, onMouseOver)
 
 
 
@@ -29,6 +33,8 @@ main =
 type alias Model =
     { imageList : List String
     , selectedImageSrc : String
+    , previousColor: String
+    , nextColor: String
     }
 
 
@@ -38,7 +44,12 @@ init images =
         srcList =
             Array.toList images
     in
-    ( { imageList = srcList, selectedImageSrc = initialSelectedImage srcList }
+    (
+    { imageList = srcList
+    , selectedImageSrc = initialSelectedImage srcList 
+    , previousColor = color.blueHex
+    , nextColor = color.blueHex
+    }
     , Cmd.none
     )
 
@@ -59,9 +70,14 @@ initialSelectedImage imageList =
 
 type Msg
     = SelectedImage String
+    | MouseOver Mouseable
+    | MouseOut Mouseable
     | PressedPrevious
     | PressedNext
 
+type Mouseable
+   = PreviousArrow
+   | NextArrow
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -84,6 +100,18 @@ update msg model =
                     getNextSrc model
             in
             ( { model | selectedImageSrc = nextImgSource }, Cmd.none )
+        MouseOver control ->
+            case control of
+                PreviousArrow ->
+                    ( { model | previousColor = color.lightBlueHex }, Cmd.none )
+                NextArrow ->
+                    ( { model | nextColor = color.lightBlueHex }, Cmd.none )
+        MouseOut control ->
+            case control of
+                PreviousArrow ->
+                    ( { model | previousColor = color.blueHex }, Cmd.none )
+                NextArrow ->
+                    ( { model | nextColor = color.blueHex }, Cmd.none )
 
 
 
@@ -174,34 +202,37 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     layout [] <|
-        column []
+        column
+            [ Background.color color.grey
+            , paddingXY 10 20
+            ]
             [ row []
-                [ button []
+                [ button [ Element.width <| px 45 ]
                     { onPress = Just PressedPrevious
-                    , label = text "prev"
+                    , label = Element.html (prevSvg model.previousColor)
                     }
-                , image
-                    [ width fill
-                    , height fill
-                    , rounded 10
-                    , clip
+                , Element.image
+                    [ Element.width Element.fill
+                    , Element.height Element.fill
+                    , rounded 8
+                    , Element.clip
                     ]
                     { src = thumbSrcToFull model.selectedImageSrc
                     , description = ""
                     }
-                , button []
+                , button [ Element.width <| px 45 ]
                     { onPress = Just PressedNext
-                    , label = text "next"
+                    , label = Element.html (nextSvg model.nextColor)
                     }
                 ]
-            , wrappedRow [ paddingXY 0 15, spacing 15 ]
+            , wrappedRow [ paddingXY 0 15, Element.spacing 15 ]
                 (List.map
                     (\source ->
-                        image
-                            [ width fill
-                            , height fill
-                            , rounded 10
-                            , clip
+                        Element.image
+                            [ Element.width Element.fill
+                            , Element.height Element.fill
+                            , rounded 8
+                            , Element.clip
                             , onClick (SelectedImage source)
                             ]
                             { src = source
@@ -211,3 +242,42 @@ view model =
                     model.imageList
                 )
             ]
+
+
+color =
+    { grey = rgb255 211 211 211
+    , blueHex = "#020d4c"
+    , lightBlueHex = "#405cd4"
+    }
+
+
+prevSvg colorState =
+    svg
+        [ Svg.Attributes.width "40"
+        , viewBox "0 0 19 28"
+        , onMouseOver (MouseOver PreviousArrow)
+        , onMouseOut (MouseOut PreviousArrow)
+        ]
+        [ Svg.path
+            [ stroke colorState
+            , Svg.Attributes.fill colorState
+            , d "M18.297 4.703l-8.297 8.297 8.297 8.297c0.391 0.391 0.391 1.016 0 1.406l-2.594 2.594c-0.391 0.391-1.016 0.391-1.406 0l-11.594-11.594c-0.391-0.391-0.391-1.016 0-1.406l11.594-11.594c0.391-0.391 1.016-0.391 1.406 0l2.594 2.594c0.391 0.391 0.391 1.016 0 1.406z"
+            ]
+            []
+        ]
+
+
+nextSvg colorState =
+    svg
+        [ Svg.Attributes.width "40"
+        , viewBox "0 0 19 28"
+        , onMouseOver (MouseOver NextArrow)
+        , onMouseOut (MouseOut NextArrow)
+        ]
+        [ Svg.path
+            [ stroke colorState
+            , Svg.Attributes.fill colorState
+            , d "M17.297 13.703l-11.594 11.594c-0.391 0.391-1.016 0.391-1.406 0l-2.594-2.594c-0.391-0.391-0.391-1.016 0-1.406l8.297-8.297-8.297-8.297c-0.391-0.391-0.391-1.016 0-1.406l2.594-2.594c0.391-0.391 1.016-0.391 1.406 0l11.594 11.594c0.391 0.391 0.391 1.016 0 1.406z"
+            ]
+            []
+        ]
