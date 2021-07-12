@@ -8,6 +8,7 @@ import Element.Border exposing (rounded)
 import Element.Events exposing (onClick)
 import Element.Input exposing (button)
 import Html exposing (Html)
+import Json.Decode as D
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (onMouseOut, onMouseOver)
@@ -31,37 +32,58 @@ main =
 
 
 type alias Model =
-    { imageList : List String
-    , selectedImageSrc : String
-    , previousColor: String
-    , nextColor: String
+    { imageList : List ImageData
+    , selectedImageData : ImageData
+    , previousColor : String
+    , nextColor : String
     }
 
 
-init : Array.Array String -> ( Model, Cmd Msg )
-init images =
+init : D.Value -> ( Model, Cmd Msg )
+init imageList =
     let
         srcList =
-            Array.toList images
+            case D.decodeValue listOfImageDataDecoder imageList of
+                Ok goodImageData ->
+                    goodImageData
+
+                Err _ ->
+                    [ { thumbSrc = ""
+                      , fullSrc = ""
+                      }
+                    ]
     in
-    (
-    { imageList = srcList
-    , selectedImageSrc = initialSelectedImage srcList 
-    , previousColor = color.blueHex
-    , nextColor = color.blueHex
-    }
+    ( { imageList = srcList
+      , selectedImageData = initialSelectedImage srcList
+      , previousColor = color.blueHex
+      , nextColor = color.blueHex
+      }
     , Cmd.none
     )
 
 
-thumbSrcToFull : String -> String
-thumbSrcToFull url =
-    String.replace "-150x150" "" url
+type alias ImageData =
+    { thumbSrc : String
+    , fullSrc : String
+    }
 
 
-initialSelectedImage : List String -> String
+imageDataDecoder : D.Decoder ImageData
+imageDataDecoder =
+    D.map2
+        ImageData
+        (D.field "thumbSrc" D.string)
+        (D.field "fullSrc" D.string)
+
+
+listOfImageDataDecoder : D.Decoder (List ImageData)
+listOfImageDataDecoder =
+    D.list imageDataDecoder
+
+
+initialSelectedImage : List ImageData -> ImageData
 initialSelectedImage imageList =
-    Maybe.withDefault "" (List.head imageList)
+    Maybe.withDefault { thumbSrc = "", fullSrc = "" } (List.head imageList)
 
 
 
@@ -69,47 +91,53 @@ initialSelectedImage imageList =
 
 
 type Msg
-    = SelectedImage String
+    = SelectedImage ImageData
     | MouseOver Mouseable
     | MouseOut Mouseable
     | PressedPrevious
     | PressedNext
 
+
 type Mouseable
-   = PreviousArrow
-   | NextArrow
+    = PreviousArrow
+    | NextArrow
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SelectedImage src ->
-            ( { model | selectedImageSrc = src }
+        SelectedImage imageData ->
+            ( { model | selectedImageData = imageData }
             , Cmd.none
             )
 
         PressedPrevious ->
             let
-                previousImgSource =
-                    getPreviousSrc model
+                previousImgData =
+                    getPreviousImage model
             in
-            ( { model | selectedImageSrc = previousImgSource }, Cmd.none )
+            ( { model | selectedImageData = previousImgData }, Cmd.none )
 
         PressedNext ->
             let
-                nextImgSource =
-                    getNextSrc model
+                nextImgData =
+                    getNextImage model
             in
-            ( { model | selectedImageSrc = nextImgSource }, Cmd.none )
+            ( { model | selectedImageData = nextImgData }, Cmd.none )
+
         MouseOver control ->
             case control of
                 PreviousArrow ->
                     ( { model | previousColor = color.lightBlueHex }, Cmd.none )
+
                 NextArrow ->
                     ( { model | nextColor = color.lightBlueHex }, Cmd.none )
+
         MouseOut control ->
             case control of
                 PreviousArrow ->
                     ( { model | previousColor = color.blueHex }, Cmd.none )
+
                 NextArrow ->
                     ( { model | nextColor = color.blueHex }, Cmd.none )
 
@@ -118,32 +146,32 @@ update msg model =
 -- HELPERS
 
 
-getImageWithNeighbours : (String -> Bool) -> List String -> ( Maybe String, Maybe String, Maybe String )
+getImageWithNeighbours : (ImageData -> Bool) -> List ImageData -> ( Maybe ImageData, Maybe ImageData, Maybe ImageData )
 getImageWithNeighbours pred imageList =
     case imageList of
-        prevSrc :: currentSrc :: nextSrc :: rest ->
-            if pred currentSrc then
-                ( Just prevSrc, Just currentSrc, Just nextSrc )
+        prevImage :: currentImage :: nextImage :: rest ->
+            if pred currentImage then
+                ( Just prevImage, Just currentImage, Just nextImage )
 
-            else if pred prevSrc then
-                ( Nothing, Just prevSrc, Just currentSrc )
-
-            else
-                getImageWithNeighbours pred (currentSrc :: nextSrc :: rest)
-
-        prevSrc :: currentSrc :: [] ->
-            if pred prevSrc then
-                ( Nothing, Just prevSrc, Just currentSrc )
-
-            else if pred currentSrc then
-                ( Just prevSrc, Just currentSrc, Nothing )
+            else if pred prevImage then
+                ( Nothing, Just prevImage, Just currentImage )
 
             else
-                getImageWithNeighbours pred [ currentSrc ]
+                getImageWithNeighbours pred (currentImage :: nextImage :: rest)
 
-        prevSrc :: [] ->
-            if pred prevSrc then
-                ( Nothing, Just prevSrc, Nothing )
+        prevImage :: currentImage :: [] ->
+            if pred prevImage then
+                ( Nothing, Just prevImage, Just currentImage )
+
+            else if pred currentImage then
+                ( Just prevImage, Just currentImage, Nothing )
+
+            else
+                getImageWithNeighbours pred [ currentImage ]
+
+        prevImage :: [] ->
+            if pred prevImage then
+                ( Nothing, Just prevImage, Nothing )
 
             else
                 ( Nothing, Nothing, Nothing )
@@ -152,38 +180,38 @@ getImageWithNeighbours pred imageList =
             ( Nothing, Nothing, Nothing )
 
 
-getPreviousSrc : Model -> String
-getPreviousSrc model =
+getPreviousImage : Model -> ImageData
+getPreviousImage model =
     let
         imageWithNeighbours =
-            getImageWithNeighbours (\src -> src == model.selectedImageSrc) model.imageList
+            getImageWithNeighbours (\src -> src == model.selectedImageData) model.imageList
 
-        ( prevImageSrc, _, _ ) =
+        ( prevImage, _, _ ) =
             imageWithNeighbours
     in
-    case prevImageSrc of
-        Just src ->
-            src
+    case prevImage of
+        Just imageData ->
+            imageData
 
         Nothing ->
-            model.selectedImageSrc
+            model.selectedImageData
 
 
-getNextSrc : Model -> String
-getNextSrc model =
+getNextImage : Model -> ImageData
+getNextImage model =
     let
         imageWithNeighbours =
-            getImageWithNeighbours (\src -> src == model.selectedImageSrc) model.imageList
+            getImageWithNeighbours (\imageData -> imageData == model.selectedImageData) model.imageList
 
-        ( _, _, nextImageSrc ) =
+        ( _, _, nextImageData ) =
             imageWithNeighbours
     in
-    case nextImageSrc of
-        Just src ->
-            src
+    case nextImageData of
+        Just imageData ->
+            imageData
 
         Nothing ->
-            model.selectedImageSrc
+            model.selectedImageData
 
 
 
@@ -204,10 +232,10 @@ view model =
     layout [] <|
         column
             [ Background.color color.grey
-            , paddingXY 10 20
+            , paddingEach { top = 20, right = 28, bottom = 0, left = 28 }
             ]
-            [ row []
-                [ button [ Element.width <| px 45 ]
+            [ row [ Element.spacing 20 ]
+                [ button [ Element.width <| px 40 ]
                     { onPress = Just PressedPrevious
                     , label = Element.html (prevSvg model.previousColor)
                     }
@@ -217,25 +245,25 @@ view model =
                     , rounded 8
                     , Element.clip
                     ]
-                    { src = thumbSrcToFull model.selectedImageSrc
+                    { src = model.selectedImageData.fullSrc
                     , description = ""
                     }
-                , button [ Element.width <| px 45 ]
+                , button [ Element.width <| px 40 ]
                     { onPress = Just PressedNext
                     , label = Element.html (nextSvg model.nextColor)
                     }
                 ]
             , wrappedRow [ paddingXY 0 15, Element.spacing 15 ]
                 (List.map
-                    (\source ->
+                    (\imageData ->
                         Element.image
                             [ Element.width Element.fill
                             , Element.height Element.fill
                             , rounded 8
                             , Element.clip
-                            , onClick (SelectedImage source)
+                            , onClick (SelectedImage imageData)
                             ]
-                            { src = source
+                            { src = imageData.thumbSrc
                             , description = ""
                             }
                     )
@@ -253,8 +281,7 @@ color =
 
 prevSvg colorState =
     svg
-        [ Svg.Attributes.width "40"
-        , viewBox "0 0 19 28"
+        [ viewBox "0 0 19 28"
         , onMouseOver (MouseOver PreviousArrow)
         , onMouseOut (MouseOut PreviousArrow)
         ]
@@ -269,8 +296,7 @@ prevSvg colorState =
 
 nextSvg colorState =
     svg
-        [ Svg.Attributes.width "40"
-        , viewBox "0 0 19 28"
+        [ viewBox "0 0 19 28"
         , onMouseOver (MouseOver NextArrow)
         , onMouseOut (MouseOut NextArrow)
         ]
