@@ -18,6 +18,9 @@ Json encoded array of image data
 ]
 ```
 
+### Serve to localhost
+`elm-live src/LightBox.elm --hot -- --output=lightbox.js`
+
 ### Compile
 
 #### Development
