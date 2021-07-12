@@ -232,10 +232,10 @@ view model =
     layout [] <|
         column
             [ Background.color color.grey
-            , paddingXY 10 20
+            , paddingEach { top = 20, right = 28, bottom = 0, left = 28 }
             ]
-            [ row []
-                [ button [ Element.width <| px 45 ]
+            [ row [ Element.spacing 20 ]
+                [ button [ Element.width <| px 40 ]
                     { onPress = Just PressedPrevious
                     , label = Element.html (prevSvg model.previousColor)
                     }
@@ -248,7 +248,7 @@ view model =
                     { src = model.selectedImageData.fullSrc
                     , description = ""
                     }
-                , button [ Element.width <| px 45 ]
+                , button [ Element.width <| px 40 ]
                     { onPress = Just PressedNext
                     , label = Element.html (nextSvg model.nextColor)
                     }
@@ -281,8 +281,7 @@ color =
 
 prevSvg colorState =
     svg
-        [ Svg.Attributes.width "40"
-        , viewBox "0 0 19 28"
+        [ viewBox "0 0 19 28"
         , onMouseOver (MouseOver PreviousArrow)
         , onMouseOut (MouseOut PreviousArrow)
         ]
@@ -297,8 +296,7 @@ prevSvg colorState =
 
 nextSvg colorState =
     svg
-        [ Svg.Attributes.width "40"
-        , viewBox "0 0 19 28"
+        [ viewBox "0 0 19 28"
         , onMouseOver (MouseOver NextArrow)
         , onMouseOut (MouseOut NextArrow)
         ]

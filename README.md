@@ -1,8 +1,30 @@
 ## Elm Lightbox
 
+### Flags
+
+Json encoded array of image data
+
+```
+[ 
+  { fullSrc = "https:/path/to/full-size/image1"
+    , thumbSrc = "https://path/to/thumbnail/image1"
+  }
+, { fullSrc = "https:/path/to/full-size/image2"
+    , thumbSrc = "https://path/to/thumbnail/image2"
+  }
+
+  ...
+
+]
+```
+
 ### Compile
 
+#### Development
 `elm make src/LightBox.elm --output=lightbox.js`
+
+#### Production
+`elm make src/LightBox.elm --optimize --output=lightbox.js`
 
 ### Embed in html
 
