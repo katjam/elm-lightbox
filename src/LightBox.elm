@@ -1,17 +1,17 @@
 module LightBox exposing (..)
 
-import Array
 import Browser
-import Element exposing (..)
+import Element exposing (clip, column, fill, layout, paddingEach, paddingXY, px, rgb255, row, spacing, wrappedRow)
 import Element.Background as Background
 import Element.Border exposing (rounded)
 import Element.Events exposing (onClick)
 import Element.Input exposing (button)
 import Html exposing (Html)
 import Json.Decode as D
-import Svg exposing (..)
-import Svg.Attributes exposing (..)
+import Svg exposing (svg)
+import Svg.Attributes exposing (d, stroke, viewBox)
 import Svg.Events exposing (onMouseOut, onMouseOver)
+import Theme exposing (color)
 
 
 
@@ -219,7 +219,7 @@ getNextImage model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 
@@ -240,10 +240,10 @@ view model =
                     , label = Element.html (prevSvg model.previousColor)
                     }
                 , Element.image
-                    [ Element.width Element.fill
-                    , Element.height Element.fill
+                    [ Element.width fill
+                    , Element.height fill
                     , rounded 8
-                    , Element.clip
+                    , clip
                     ]
                     { src = model.selectedImageData.fullSrc
                     , description = ""
@@ -253,14 +253,14 @@ view model =
                     , label = Element.html (nextSvg model.nextColor)
                     }
                 ]
-            , wrappedRow [ paddingXY 0 15, Element.spacing 15 ]
+            , wrappedRow [ paddingXY 0 15, spacing 15 ]
                 (List.map
                     (\imageData ->
                         Element.image
-                            [ Element.width Element.fill
-                            , Element.height Element.fill
+                            [ Element.width fill
+                            , Element.height fill
                             , rounded 8
-                            , Element.clip
+                            , clip
                             , onClick (SelectedImage imageData)
                             ]
                             { src = imageData.thumbSrc
@@ -272,13 +272,7 @@ view model =
             ]
 
 
-color =
-    { grey = rgb255 211 211 211
-    , blueHex = "#020d4c"
-    , lightBlueHex = "#405cd4"
-    }
-
-
+prevSvg : String -> Html Msg
 prevSvg colorState =
     svg
         [ viewBox "0 0 19 28"
@@ -294,6 +288,7 @@ prevSvg colorState =
         ]
 
 
+nextSvg : String -> Html Msg
 nextSvg colorState =
     svg
         [ viewBox "0 0 19 28"
