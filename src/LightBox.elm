@@ -99,7 +99,7 @@ type Msg
     = SelectedImage ImageData
     | MouseOver Mouseable
     | MouseOut Mouseable
-    | PressedKey String
+    | PressedKey Direction
     | PressedPrevious
     | PressedNext
 
@@ -117,10 +117,16 @@ update msg model =
             , Cmd.none
             )
 
-        PressedKey keyValue ->
-            case keyValue of
-                _ ->
+        PressedKey direction ->
+            case direction of
+                Previous ->
                     ( { model | selectedImageData = getPreviousImage model }, Cmd.none )
+
+                Next ->
+                    ( { model | selectedImageData = getNextImage model }, Cmd.none )
+
+                NotDirectional ->
+                    ( model, Cmd.none )
 
         PressedPrevious ->
             let
@@ -234,9 +240,28 @@ subscriptions _ =
     Sub.batch [ onKeyDown (D.map PressedKey keyDecoder) ]
 
 
-keyDecoder : D.Decoder String
+keyDecoder : D.Decoder Direction
 keyDecoder =
-    D.field "key" D.string
+    D.map toDirection (D.field "key" D.string)
+
+
+type Direction
+    = Previous
+    | Next
+    | NotDirectional
+
+
+toDirection : String -> Direction
+toDirection keyString =
+    case keyString of
+        "ArrowLeft" ->
+            Previous
+
+        "ArrowRight" ->
+            Next
+
+        _ ->
+            NotDirectional
 
 
 
