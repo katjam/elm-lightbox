@@ -51,6 +51,7 @@ init imageList =
                 Err _ ->
                     [ { thumbSrc = ""
                       , fullSrc = ""
+                      , altText = ""
                       }
                     ]
     in
@@ -66,15 +67,17 @@ init imageList =
 type alias ImageData =
     { thumbSrc : String
     , fullSrc : String
+    , altText : String
     }
 
 
 imageDataDecoder : D.Decoder ImageData
 imageDataDecoder =
-    D.map2
+    D.map3
         ImageData
         (D.field "thumbSrc" D.string)
         (D.field "fullSrc" D.string)
+        (D.field "altText" D.string)
 
 
 listOfImageDataDecoder : D.Decoder (List ImageData)
@@ -84,7 +87,7 @@ listOfImageDataDecoder =
 
 initialSelectedImage : List ImageData -> ImageData
 initialSelectedImage imageList =
-    Maybe.withDefault { thumbSrc = "", fullSrc = "" } (List.head imageList)
+    Maybe.withDefault { thumbSrc = "", fullSrc = "", altText = "" } (List.head imageList)
 
 
 
@@ -252,7 +255,7 @@ view model =
                     , clip
                     ]
                     { src = model.selectedImageData.fullSrc
-                    , description = ""
+                    , description = model.selectedImageData.altText
                     }
                 , button [ Element.width <| px 40 ]
                     { onPress = Just PressedNext
@@ -270,7 +273,7 @@ view model =
                             , onClick (SelectedImage imageData)
                             ]
                             { src = imageData.thumbSrc
-                            , description = ""
+                            , description = imageData.altText
                             }
                     )
                     model.imageList
