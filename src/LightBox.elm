@@ -229,7 +229,7 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    layout [] <|
+    layout [ Element.width (fill |> Element.maximum 1200) ] <|
         column
             [ Background.color color.grey
             , paddingEach { top = 20, right = 28, bottom = 0, left = 28 }
@@ -257,7 +257,7 @@ view model =
                 (List.map
                     (\imageData ->
                         Element.image
-                            [ Element.width fill
+                            [ Element.width (fill |> Element.minimum 120 |> Element.maximum 150)
                             , Element.height fill
                             , rounded 8
                             , clip
