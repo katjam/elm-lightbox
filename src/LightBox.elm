@@ -1,6 +1,7 @@
 module LightBox exposing (..)
 
 import Browser
+import Browser.Events exposing (onKeyDown, onKeyUp)
 import Element exposing (clip, column, fill, layout, paddingEach, paddingXY, px, rgb255, row, spacing, wrappedRow)
 import Element.Background as Background
 import Element.Border exposing (rounded)
@@ -98,6 +99,8 @@ type Msg
     = SelectedImage ImageData
     | MouseOver Mouseable
     | MouseOut Mouseable
+    | PressedKey Direction
+    | LiftedKey Direction
     | PressedPrevious
     | PressedNext
 
@@ -114,6 +117,38 @@ update msg model =
             ( { model | selectedImageData = imageData }
             , Cmd.none
             )
+
+        PressedKey direction ->
+            case direction of
+                Previous ->
+                    ( { model
+                        | selectedImageData = getPreviousImage model
+                        , previousColor = color.lightBlueHex
+                      }
+                    , Cmd.none
+                    )
+
+                Next ->
+                    ( { model
+                        | selectedImageData = getNextImage model
+                        , nextColor = color.lightBlueHex
+                      }
+                    , Cmd.none
+                    )
+
+                NotDirectional ->
+                    ( model, Cmd.none )
+
+        LiftedKey direction ->
+            case direction of
+                Previous ->
+                    ( { model | previousColor = color.blueHex }, Cmd.none )
+
+                Next ->
+                    ( { model | nextColor = color.blueHex }, Cmd.none )
+
+                NotDirectional ->
+                    ( model, Cmd.none )
 
         PressedPrevious ->
             let
@@ -224,7 +259,34 @@ getNextImage model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Sub.batch
+        [ onKeyDown (D.map PressedKey keyDecoder)
+        , onKeyUp (D.map LiftedKey keyDecoder)
+        ]
+
+
+keyDecoder : D.Decoder Direction
+keyDecoder =
+    D.map toDirection (D.field "key" D.string)
+
+
+type Direction
+    = Previous
+    | Next
+    | NotDirectional
+
+
+toDirection : String -> Direction
+toDirection keyString =
+    case keyString of
+        "ArrowLeft" ->
+            Previous
+
+        "ArrowRight" ->
+            Next
+
+        _ ->
+            NotDirectional
 
 
 
