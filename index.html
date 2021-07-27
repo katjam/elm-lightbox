@@ -1,0 +1,60 @@
+<html>
+<head>
+  <style>
+    /* custom styles here */
+  </style>
+</head>
+<body>
+  <div id="lightbox"></div>
+  <!-- Relative to index.html, lightbox.elm lives in `src/LightBox.elm`. -->
+  <!-- Prefixing that with `/_compile/` gives us magic! -->
+  <script src="/lightbox.js"></script>
+  <script>
+    var testImages = [
+          {fullSrc: "	http://wp_pr/wp-content/uploads/2021/06/IMG_7124-scaled-1100x600-1-1024x559.jpg"
+          , thumbSrc: "	http://wp_pr/wp-content/uploads/2021/06/IMG_7124-scaled-1100x600-1-150x150.jpg"
+          }
+      , 
+          { fullSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7349-scaled-1100x600-1-1024x559.jpg"
+          , thumbSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7349-scaled-1100x600-1-150x150.jpg"
+          }
+      ,
+          { fullSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7126-scaled-1100x600-1-1024x559.jpg"
+          , thumbSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7126-scaled-1100x600-1-150x150.jpg"
+          }
+      ,
+          { fullSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7130-scaled-1100x600-1-1024x559.jpg"
+          , thumbSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7130-scaled-1100x600-1-150x150.jpg"
+          }
+      , 
+          { fullSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7349-scaled-1100x600-1-1024x559.jpg"
+          , thumbSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7349-scaled-1100x600-1-150x150.jpg"
+          }
+      ,
+          { fullSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7126-scaled-1100x600-1-1024x559.jpg"
+          , thumbSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7126-scaled-1100x600-1-150x150.jpg"
+          }
+      ,
+          { fullSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7130-scaled-1100x600-1-1024x559.jpg"
+          , thumbSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7130-scaled-1100x600-1-150x150.jpg"
+          }
+      , 
+          { fullSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7349-scaled-1100x600-1-1024x559.jpg"
+          , thumbSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7349-scaled-1100x600-1-150x150.jpg"
+          }
+      ,
+          { fullSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7126-scaled-1100x600-1-1024x559.jpg"
+          , thumbSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7126-scaled-1100x600-1-150x150.jpg"
+          }
+      ,
+          { fullSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7130-scaled-1100x600-1-1024x559.jpg"
+          , thumbSrc: "http://wp_pr/wp-content/uploads/2021/06/IMG_7130-scaled-1100x600-1-150x150.jpg"
+          }
+        ];
+    var app = Elm.LightBox.init({
+      node: document.getElementById('lightbox'),
+      flags: testImages,
+    });
+  </script>
+</body>
+</html>
