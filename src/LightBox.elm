@@ -1,6 +1,7 @@
 module LightBox exposing (..)
 
 import Browser
+import Browser.Events exposing (onKeyDown)
 import Element exposing (clip, column, fill, layout, paddingEach, paddingXY, px, rgb255, row, spacing, wrappedRow)
 import Element.Background as Background
 import Element.Border exposing (rounded)
@@ -98,6 +99,7 @@ type Msg
     = SelectedImage ImageData
     | MouseOver Mouseable
     | MouseOut Mouseable
+    | PressedKey String
     | PressedPrevious
     | PressedNext
 
@@ -114,6 +116,11 @@ update msg model =
             ( { model | selectedImageData = imageData }
             , Cmd.none
             )
+
+        PressedKey keyValue ->
+            case keyValue of
+                _ ->
+                    ( { model | selectedImageData = getPreviousImage model }, Cmd.none )
 
         PressedPrevious ->
             let
@@ -224,7 +231,12 @@ getNextImage model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Sub.batch [ onKeyDown (D.map PressedKey keyDecoder) ]
+
+
+keyDecoder : D.Decoder String
+keyDecoder =
+    D.field "key" D.string
 
 
 
