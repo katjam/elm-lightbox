@@ -1,7 +1,7 @@
 module LightBox exposing (..)
 
 import Browser
-import Browser.Events exposing (onKeyDown)
+import Browser.Events exposing (onKeyDown, onKeyUp)
 import Element exposing (clip, column, fill, layout, paddingEach, paddingXY, px, rgb255, row, spacing, wrappedRow)
 import Element.Background as Background
 import Element.Border exposing (rounded)
@@ -100,6 +100,7 @@ type Msg
     | MouseOver Mouseable
     | MouseOut Mouseable
     | PressedKey Direction
+    | LiftedKey Direction
     | PressedPrevious
     | PressedNext
 
@@ -120,10 +121,31 @@ update msg model =
         PressedKey direction ->
             case direction of
                 Previous ->
-                    ( { model | selectedImageData = getPreviousImage model }, Cmd.none )
+                    ( { model
+                        | selectedImageData = getPreviousImage model
+                        , previousColor = color.lightBlueHex
+                      }
+                    , Cmd.none
+                    )
 
                 Next ->
-                    ( { model | selectedImageData = getNextImage model }, Cmd.none )
+                    ( { model
+                        | selectedImageData = getNextImage model
+                        , nextColor = color.lightBlueHex
+                      }
+                    , Cmd.none
+                    )
+
+                NotDirectional ->
+                    ( model, Cmd.none )
+
+        LiftedKey direction ->
+            case direction of
+                Previous ->
+                    ( { model | previousColor = color.blueHex }, Cmd.none )
+
+                Next ->
+                    ( { model | nextColor = color.blueHex }, Cmd.none )
 
                 NotDirectional ->
                     ( model, Cmd.none )
@@ -237,7 +259,10 @@ getNextImage model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.batch [ onKeyDown (D.map PressedKey keyDecoder) ]
+    Sub.batch
+        [ onKeyDown (D.map PressedKey keyDecoder)
+        , onKeyUp (D.map LiftedKey keyDecoder)
+        ]
 
 
 keyDecoder : D.Decoder Direction
