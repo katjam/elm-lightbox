@@ -7,6 +7,7 @@ import Element.Border exposing (rounded)
 import Element.Events exposing (onClick)
 import Element.Input exposing (button)
 import Html exposing (Html)
+import Html.Attributes
 import Json.Decode as D
 import Svg exposing (svg)
 import Svg.Attributes exposing (d, stroke, viewBox)
@@ -229,12 +230,17 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    layout [ Element.width (fill |> Element.maximum 1200) ] <|
+    layout
+        [ Element.width (fill |> Element.maximum 1200)
+        ]
+    <|
         column
             [ Background.color color.grey
             , paddingEach { top = 20, right = 28, bottom = 0, left = 28 }
             ]
-            [ row [ Element.spacing 20 ]
+            [ row
+                [ Element.spacing 20
+                ]
                 [ button [ Element.width <| px 40 ]
                     { onPress = Just PressedPrevious
                     , label = Element.html (prevSvg model.previousColor)
@@ -257,7 +263,7 @@ view model =
                 (List.map
                     (\imageData ->
                         Element.image
-                            [ Element.width (fill |> Element.minimum 120 |> Element.maximum 150)
+                            [ Element.width (fill |> Element.minimum 150 |> Element.maximum 150)
                             , Element.height fill
                             , rounded 8
                             , clip
