@@ -7,10 +7,12 @@ Json encoded array of image data
 ```
 [ 
   { fullSrc = "https:/path/to/full-size/image1"
-    , thumbSrc = "https://path/to/thumbnail/image1"
+  , thumbSrc = "https://path/to/thumbnail/image1"
+  , altText = "Some alt text"
   }
 , { fullSrc = "https:/path/to/full-size/image2"
-    , thumbSrc = "https://path/to/thumbnail/image2"
+  , thumbSrc = "https://path/to/thumbnail/image2"
+  , altText = "Some other alt text"
   }
 
   ...
