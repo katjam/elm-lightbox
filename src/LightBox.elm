@@ -327,7 +327,9 @@ teaserView model =
         column
             [ Background.color color.grey
             ]
-            [ wrappedRow [ spacing 15 ]
+            [ wrappedRow
+                [ spacing 15
+                ]
                 ([ Element.image
                     [ Element.width (fill |> Element.minimum 300 |> Element.maximum 300)
                     , Element.height (fill |> Element.maximum 142)
@@ -358,12 +360,13 @@ teaserView model =
 fullView : Model -> Html Msg
 fullView model =
     layout
-        [ Element.width (fill |> Element.maximum 1200)
+        [ Element.width (fill |> Element.minimum 280 |> Element.maximum 1200)
         ]
     <|
         column
             [ Background.color color.grey
             , paddingEach { top = 20, right = 28, bottom = 0, left = 28 }
+            , Element.htmlAttribute (Html.Attributes.class "minimal-padding")
             ]
             [ row
                 [ Element.spacing 20
@@ -373,8 +376,8 @@ fullView model =
                     , label = Element.html (prevSvg model.previousColor)
                     }
                 , Element.image
-                    [ Element.width fill
-                    , Element.height fill
+                    [ Element.height fill
+                    , Element.width (fill |> Element.minimum 280)
                     , rounded 8
                     , clip
                     ]
@@ -386,7 +389,11 @@ fullView model =
                     , label = Element.html (nextSvg model.nextColor)
                     }
                 ]
-            , wrappedRow [ paddingXY 0 15, spacing 15 ]
+            , wrappedRow
+                [ paddingXY 0 15
+                , Element.htmlAttribute (Html.Attributes.class "wrap-center")
+                , spacing 15
+                ]
                 (List.map
                     (\imageData ->
                         Element.image
