@@ -33,19 +33,26 @@ main =
 -- MODEL
 
 
+type alias Flags =
+    { imageList : D.Value
+    , isTeaser : String
+    }
+
+
 type alias Model =
     { imageList : List ImageData
+    , isTeaser : Bool
     , selectedImageData : ImageData
     , previousColor : String
     , nextColor : String
     }
 
 
-init : D.Value -> ( Model, Cmd Msg )
-init imageList =
+init : Flags -> ( Model, Cmd Msg )
+init flags =
     let
-        srcList =
-            case D.decodeValue listOfImageDataDecoder imageList of
+        decodedSrcList =
+            case D.decodeValue listOfImageDataDecoder flags.imageList of
                 Ok goodImageData ->
                     goodImageData
 
@@ -55,9 +62,18 @@ init imageList =
                       , altText = ""
                       }
                     ]
+
+        decodedIsTeaser =
+            case D.decodeString D.bool flags.isTeaser of
+                Ok boolean ->
+                    boolean
+
+                Err _ ->
+                    False
     in
-    ( { imageList = srcList
-      , selectedImageData = initialSelectedImage srcList
+    ( { imageList = decodedSrcList
+      , isTeaser = decodedIsTeaser
+      , selectedImageData = initialSelectedImage decodedSrcList
       , previousColor = color.blueHex
       , nextColor = color.blueHex
       }
@@ -295,6 +311,52 @@ toDirection keyString =
 
 view : Model -> Html Msg
 view model =
+    if model.isTeaser then
+        teaserView model
+
+    else
+        fullView model
+
+
+teaserView : Model -> Html Msg
+teaserView model =
+    layout
+        [ Element.width (fill |> Element.maximum 800)
+        ]
+    <|
+        column
+            [ Background.color color.grey
+            ]
+            [ wrappedRow [ spacing 15 ]
+                ([ Element.image
+                    [ Element.width (fill |> Element.minimum 300 |> Element.maximum 300)
+                    , Element.height (fill |> Element.maximum 142)
+                    , rounded 8
+                    , clip
+                    ]
+                    { src = model.selectedImageData.fullSrc
+                    , description = model.selectedImageData.altText
+                    }
+                 ]
+                    ++ List.map
+                        (\imageData ->
+                            Element.image
+                                [ Element.width (fill |> Element.minimum 142 |> Element.maximum 142)
+                                , Element.height fill
+                                , rounded 8
+                                , clip
+                                ]
+                                { src = imageData.thumbSrc
+                                , description = imageData.altText
+                                }
+                        )
+                        (List.take 4 (List.drop 1 model.imageList))
+                )
+            ]
+
+
+fullView : Model -> Html Msg
+fullView model =
     layout
         [ Element.width (fill |> Element.maximum 1200)
         ]

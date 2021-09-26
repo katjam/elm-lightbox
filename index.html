@@ -5,7 +5,8 @@
   </style>
 </head>
 <body>
-  <div id="lightbox"></div>
+  <div id="teaser-lightbox"></div>
+  <div id="full-lightbox"></div>
   <!-- Relative to index.html, lightbox.elm lives in `src/LightBox.elm`. -->
   <!-- Prefixing that with `/_compile/` gives us magic! -->
   <script src="/lightbox.js"></script>
@@ -61,9 +62,13 @@
           , altText: ""
           }
         ];
-    var app = Elm.LightBox.init({
-      node: document.getElementById('lightbox'),
-      flags: testImages,
+    var teaser = Elm.LightBox.init({
+      node: document.getElementById('teaser-lightbox'),
+      flags: { isTeaser: "true", imageList: testImages }
+    });
+    var full = Elm.LightBox.init({
+      node: document.getElementById('full-lightbox'),
+      flags: { isTeaser: "false", imageList: testImages }
     });
   </script>
 </body>
