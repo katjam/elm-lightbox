@@ -326,11 +326,10 @@ teaserView model =
     <|
         column
             [ Background.color color.grey
+            , spacing 15
             ]
-            [ wrappedRow
-                [ spacing 15
-                ]
-                ([ Element.image
+            [ row [ spacing 15 ]
+                [ Element.image
                     [ Element.width (fill |> Element.minimum 300 |> Element.maximum 300)
                     , Element.height (fill |> Element.maximum 142)
                     , rounded 8
@@ -339,20 +338,21 @@ teaserView model =
                     { src = model.selectedImageData.fullSrc
                     , description = model.selectedImageData.altText
                     }
-                 ]
-                    ++ List.map
-                        (\imageData ->
-                            Element.image
-                                [ Element.width (fill |> Element.minimum 142 |> Element.maximum 142)
-                                , Element.height fill
-                                , rounded 8
-                                , clip
-                                ]
-                                { src = imageData.thumbSrc
-                                , description = imageData.altText
-                                }
-                        )
-                        (List.take 4 (List.drop 1 model.imageList))
+                ]
+            , row [ spacing 15 ]
+                (List.map
+                    (\imageData ->
+                        Element.image
+                            [ Element.width (fill |> Element.minimum 142 |> Element.maximum 142)
+                            , Element.height fill
+                            , rounded 8
+                            , clip
+                            ]
+                            { src = imageData.thumbSrc
+                            , description = imageData.altText
+                            }
+                    )
+                    (List.take 2 (List.drop 1 model.imageList))
                 )
             ]
 
