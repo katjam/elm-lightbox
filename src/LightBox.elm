@@ -330,8 +330,8 @@ teaserView model =
             ]
             [ row [ spacing 15 ]
                 [ Element.image
-                    [ Element.width (fill |> Element.minimum 300 |> Element.maximum 300)
-                    , Element.height (fill |> Element.maximum 142)
+                    [ Element.width (fill |> Element.minimum 250 |> Element.maximum 250)
+                    , Element.height (fill |> Element.maximum 117)
                     , rounded 8
                     , clip
                     ]
@@ -343,7 +343,7 @@ teaserView model =
                 (List.map
                     (\imageData ->
                         Element.image
-                            [ Element.width (fill |> Element.minimum 142 |> Element.maximum 142)
+                            [ Element.width (fill |> Element.minimum 117 |> Element.maximum 117)
                             , Element.height fill
                             , rounded 8
                             , clip
